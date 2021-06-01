@@ -24,27 +24,43 @@ def solve_tkt(web,tip):
     for i in emps:
         i.send_keys(tip[t])
         t+=1
-    time.sleep(1)
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
+    time.sleep(1)
+    try:
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
+    except:
+        pass
 
 
 
 
 def solve_danxt(web,tip):
     op = web.find_elements_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[1]/div[4]/div')
+    ans = ''.join(tip)
     for i in op:
-        if i.text[3:] in tip:
+        if i.text[3:] in ans:
             i.click()
-    time.sleep(1)
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
+    time.sleep(1)
+    try:
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
+    except:
+        pass
 
 def solve_duoxt(web,tip):
     op=web.find_elements_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[1]/div[4]/div')
     for i in op:
         if i.text[3:] in tip:
             i.click()
-    time.sleep(1)
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
+    time.sleep(1)
+    try:
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
+    except:
+        pass
 
 def solve_vedio(web):
     emps = web.find_elements_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[1]/div[2]/div/input')
@@ -52,10 +68,13 @@ def solve_vedio(web):
     for i in emps:
         i.send_keys('123')
         t += 1
-    time.sleep(1)
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
     time.sleep(1)
-    web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
+    try:
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
+    except:
+        pass
 
 
 
