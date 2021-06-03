@@ -1,11 +1,12 @@
 from selenium.webdriver import Chrome
 import time
 from selenium.webdriver.chrome.options import Options
+import random
 
 def get_tip(web):
-    time.sleep(1)
+    time.sleep(random.randrange(1,3))
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[1]/div[3]/span').click()
-    time.sleep(1)
+    time.sleep(random.randrange(1,3))
     try:
         tips = web.find_elements_by_xpath('//*[@id="body-body"]/div[4]/div/div/div/div[2]/div/div/div/font')
     except:
@@ -26,7 +27,7 @@ def solve_tkt(web,tip):
         i.send_keys(tip[t])
         t+=1
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
-    time.sleep(1)
+    time.sleep(random.randrange(1,3))
     try:
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
@@ -42,7 +43,7 @@ def solve_danxt(web,tip):
         if i.text[3:] in tip:
             i.click()
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
-    time.sleep(1)
+    time.sleep(random.randrange(1,4))
     try:
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
@@ -56,7 +57,7 @@ def solve_duoxt(web,tip):
         if i.text[3:] in ans:
             i.click()
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
-    time.sleep(1)
+    time.sleep(random.randrange(1,3))
     try:
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
@@ -70,7 +71,7 @@ def solve_vedio(web):
         i.send_keys('123')
         t += 1
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
-    time.sleep(1)
+    time.sleep(random.randrange(1,4))
     try:
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
@@ -109,17 +110,19 @@ def main():
 
     for j in range(l):
         entrance=get_all_issue_name(web)
+        if '重新答题' in entrance[0][j]:
+            continue
 
         entrance[1][j].click()
         for i in range(5):
             tip = get_tip(web)
             kind = get_kind(web)
             solve(web, tip, kind)
-            time.sleep(2)
+            time.sleep(random.randrange(2,6))
         print(entrance[0][j].split('/')[0]+'解决了！！！')
         web.back()
 
-        time.sleep(2)
+        time.sleep(random.randrange(2,5))
 
 
 
@@ -128,4 +131,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    print(l)

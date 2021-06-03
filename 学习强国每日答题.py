@@ -1,10 +1,12 @@
 from selenium.webdriver import Chrome
 import time
 from selenium.webdriver.chrome.options import Options
+import random
 
 def get_tip(web):
+    time.sleep(1)
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[1]/div[3]/span').click()
-    time.sleep(2)
+    time.sleep(random.randrange(2,5))
     try:
         tips = web.find_elements_by_xpath('//*[@id="body-body"]/div[4]/div/div/div/div[2]/div/div/div/font')
     except:
@@ -25,7 +27,7 @@ def solve_tkt(web,tip):
         i.send_keys(tip[t])
         t+=1
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
-    time.sleep(1)
+    time.sleep(random.randrange(1,3))
     try:
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
@@ -42,7 +44,7 @@ def solve_danxt(web,tip):
         if i.text[3:] in ans:
             i.click()
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
-    time.sleep(1)
+    time.sleep(random.randrange(1,4))
     try:
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
@@ -55,7 +57,7 @@ def solve_duoxt(web,tip):
         if i.text[3:] in tip:
             i.click()
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
-    time.sleep(1)
+    time.sleep(random.randrange(1,5))
     try:
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
@@ -69,7 +71,7 @@ def solve_vedio(web):
         i.send_keys('123')
         t += 1
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
-    time.sleep(1)
+    time.sleep(random.randrange(1,3))
     try:
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
@@ -107,7 +109,7 @@ def main():
         print(kind)
         print('=======')
         solve(web,tip,kind)
-        time.sleep(2)
+        time.sleep(random.randrange(2,5))
 
 
 
