@@ -1,7 +1,6 @@
 from selenium.webdriver import Chrome
 import time
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
 import random
 
 
@@ -123,7 +122,7 @@ def get_all_jifeng_but(web):
     # buts=web.find_elements_by_xpath('//*[@id="app"]/div/div[2]/div/div[3]/div[2]/div/div[2]/div[2]/div')
     buts = web.find_elements_by_xpath('//*[@id="app"]/div/div[2]/div/div[3]/div[2]/div')
 
-    useful_but = [[], [], [], []]
+    useful_but = [[], [], [], []]#0是题型，1是按钮，3是状态
 
     for i in buts:
         # if i.find_element_by_xpath("./div[2]/div[2]/div").text!='已完成':
@@ -436,8 +435,17 @@ def switch_to_play_and_switch_back(web):
     play_audio(web)
     #ActionChains(web).move_to_element_with_offset(audio,27,27).click().perform()
     sleep()
-    web.switch_to.window(web.window_handles[2])
+    web.switch_to.window(web.window_handles[1])
     sleep()
+
+
+def close_atrticle(web):
+    try:
+        web.switch_to.window(web.window_handles[1])
+        web.close()
+        return True
+    except:
+        return False
 
 
 def play_audio(web):
@@ -447,11 +455,78 @@ def play_audio(web):
     web.execute_script("return arguments[0].play()",audio)
     #ActionChains(web).move_to_element_with_offset(audio, 1, 28).click().perform()
 
+def play_vedio(web):
+    vedio_items=web.find_elements_by_xpath('//*[@id="6231cc81a4"]/div/div/div/div/div/div/section/div/div/div/div/div')
+    t=0
+
+    for i in vedio_items:
+        vedio_time=i.text[:5].split(':')
+        true_time=int(vedio_time[0])*60+int(vedio_time[1])
+        print(true_time,'-----',vedio_time)
+
+        i.click()
+        sleep()
+        close_vedio(web,true_time)
+        sleep()
+        t+=1
+        if t==6:
+            break
+
+
+
+def close_vedio(web,wait_time):
+    web.switch_to.window(web.window_handles[1])
+    time.sleep(wait_time+random.randrange(1,3))
+    web.close()
+    web.switch_to.window(web.window_handles[0])
+
+
+def enter_bialing(web):
+    #jsCode = "var q=document.documentElement.scrollTop=100000"
+    #web.execute_script(jsCode)
+    sleep()
+    target = web.find_element_by_id("JEDXfdDkvQ")
+    web.execute_script("arguments[0].scrollIntoView();", target)  # 拖动到可见的元素去
+    sleep()
+    web.find_element_by_xpath('//*[@id="JEDXfdDkvQ"]/div/div/div/div/div/div/span/img').click()
+
+    sleep()
+    web.close()
+    web.switch_to.window(web.window_handles[0])
+    sleep()
+    play_vedio(web)
+
+
+def back_my_point(web):
+    web.find_element_by_xpath('//*[@id="root"]/div/header/div[1]/div/a').click()
+    sleep()
+    web.close()
+    web.switch_to.window(web.window_handles[0])
+    sleep()
+    web.find_element_by_xpath('//*[@id="root"]/div/div/section/div/div/div/div/div[4]/section/div[4]').click()
+    sleep()
+    web.close()
+    web.switch_to.window(web.window_handles[0])
+    sleep()
+
 
 
 def obtian_another_point(web):
     unfin_but = get_all_jifeng_but(web)
-    get_article_point(web)
+    if unfin_but[3][2]=='去看看':
+        unfin_but[1][2].click()
+        web.close()
+        web.switch_to.window(web.window_handles[0])
+        sleep()
+        enter_bialing(web)
+        sleep()
+        back_my_point(web)
+
+    if unfin_but[3][1]=='去看看':
+        unfin_but[1][1].click()
+        web.close()
+        web.switch_to.window(web.window_handles[0])
+        get_article_point(web)
 
 
 
@@ -467,7 +542,7 @@ def main():
     web.get('https://pc.xuexi.cn/points/my-points.html')
     time.sleep(10)  # 请务必在10秒内进行扫码登录，否则程序将报错
     answer(web)
-    #obtian_another_point(web)
+    obtian_another_point(web)
 
 
 def text_daily():
@@ -526,6 +601,49 @@ def text_weeklyToMypoint():
     changeBackMyPoint(web)
 
 
+def text_vedioplay():
+    option = Options()
+    option.add_argument('--disable-blink-features=AutomationControlled')
+    option.add_experimental_option('excludeSwitches', ['enable-automation'])
+    option.add_experimental_option("detach", True)
+
+    web = Chrome(options=option)
+    web.get('https://www.xuexi.cn/xxqg.html?id=c7c3b74e1887422c9733b0d22bf25498')
+    time.sleep(10)
+    play_vedio(web)
+
+
+def text_enterbailing():
+    option = Options()
+    option.add_argument('--disable-blink-features=AutomationControlled')
+    option.add_experimental_option('excludeSwitches', ['enable-automation'])
+    option.add_experimental_option("detach", True)
+
+    web = Chrome(options=option)
+    web.maximize_window()
+    web.implicitly_wait(3)
+    web.get('https://www.xuexi.cn/')
+    time.sleep(10)  # 请务必在10秒内进行扫码登录，否则程序将报错
+    enter_bialing(web)
+
+
+def text_backMyPoint():
+    option = Options()
+    option.add_argument('--disable-blink-features=AutomationControlled')
+    option.add_experimental_option('excludeSwitches', ['enable-automation'])
+    option.add_experimental_option("detach", True)
+
+    web = Chrome(options=option)
+    web.maximize_window()
+    web.implicitly_wait(3)
+    web.get('https://www.xuexi.cn/xxqg.html?id=c7c3b74e1887422c9733b0d22bf25498')
+    time.sleep(10)  # 请务必在10秒内进行扫码登录，否则程序将报错
+    back_my_point(web)
+
+
 if __name__ == '__main__':
+
     main()
+
+
 
