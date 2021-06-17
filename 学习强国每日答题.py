@@ -81,7 +81,7 @@ def solve_vedio(web):
 
 
 def solve(web,tip,kind):
-    if len(tip)==0:
+    if tip==[]:
         solve_vedio()
     elif kind=='填空题':
         solve_tkt(web,tip)
