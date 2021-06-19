@@ -2,6 +2,7 @@ from selenium.webdriver import Chrome
 import time
 from selenium.webdriver.chrome.options import Options
 import random
+import math
 
 
 def sleep():
@@ -371,31 +372,13 @@ def get_article_point(web):
     get_all_article_title(web)
 
 def get_all_article_title(web):
-    with open('已经听过的音频.txt',mode='r+') as f:
-        already=f.read()
-    print(already)
-    # f=open('已经听过的音频.txt',mode='a+')
-    # items=web.find_elements_by_xpath('//*[@id="root"]/div/div/section/div/div/div/div/d'
-    #                                  'iv/section/div/div/div/div/div/section/div/div/div/div/'
-    #                                  'div/section/div/div/div/div/div[3]/section/div/div/div/div/d'
-    #                                  'iv/section/div/div/div[1]/div/div')
-    # t=0
-    #
-    # for i in items:
-    #     if i.text in already:
-    #         continue
-    #     f.write(i.text)
-    #     i.click()
-    #     switch_to_play_and_switch_back(web)
-    #     t+=1
-    #     if t==12:
-    #         break
-    # if t!=12:
-    #
-    # f.close()
+    #with open('已经听过的音频.txt',mode='r+') as f:
+     #   already=f.read()
+    #print(already)
+    already=[]
     t=0
     f=0
-    while t<12:
+    while t<6:
         t=enter_each_article(web,already,t)
         sleep()
         if f==0:
@@ -407,7 +390,7 @@ def get_all_article_title(web):
 
 
 def enter_each_article(web,already,t):
-    f = open('已经听过的音频.txt', mode='a+')
+    #f = open('已经听过的音频.txt', mode='a+')
     items = web.find_elements_by_xpath('//*[@id="root"]/div/div/section/div/div/div/div/d'
                                        'iv/section/div/div/div/div/div/section/div/div/div/div/'
                                        'div/section/div/div/div/div/div[3]/section/div/div/div/div/d'
@@ -417,23 +400,23 @@ def enter_each_article(web,already,t):
     for i in items:
         if i.text in already:
             continue
-        f.write(i.text)
+        #f.write(i.text)
         i.click()
         switch_to_play_and_switch_back(web)
         t += 1
-        if t == 12:
+        if t == 6:
             break
 
 
-    f.close()
+    #f.close()
     return t
 
 def switch_to_play_and_switch_back(web):
     web.switch_to.window(web.window_handles[-1])
     sleep()
-    #audio=web.find_element_by_xpath('//*[@id="root"]/div/section/div/div/div/div/div[2]/section/div/div/div/div/div/div/div[3]/div[1]/div[1]/audio')
+
     play_audio(web)
-    #ActionChains(web).move_to_element_with_offset(audio,27,27).click().perform()
+
     sleep()
     web.switch_to.window(web.window_handles[1])
     sleep()
@@ -453,37 +436,46 @@ def play_audio(web):
     audio = web.find_element_by_xpath('//*[@id="root"]/div/section/div/div/div/div/div[2]/section/div/div/div/div/div/div/div[3]/div[1]/div[1]/audio')
     audio.click()
     web.execute_script("return arguments[0].play()",audio)
-    #ActionChains(web).move_to_element_with_offset(audio, 1, 28).click().perform()
+    sleep()
+    page = web.find_elements_by_xpath(
+        '//*[@id="root"]/div/section/div/div/div/div/div[2]/section/div/div/div/div/div/div/div[3]/div[1]/p')
+    l=len(page)
+    waittime=math.ceil(60/l)
+    for i in page:
+        web.execute_script("arguments[0].scrollIntoView();", i)  # 拖动到可见的元素去
+        time.sleep(waittime)
 
 def play_vedio(web):
     vedio_items=web.find_elements_by_xpath('//*[@id="6231cc81a4"]/div/div/div/div/div/div/section/div/div/div/div/div')
     t=0
-
+    already_time=0
     for i in vedio_items:
+
         vedio_time=i.text[:5].split(':')
         true_time=int(vedio_time[0])*60+int(vedio_time[1])
         print(true_time,'-----',vedio_time)
-
+        already_time+=true_time
         i.click()
         sleep()
         close_vedio(web,true_time)
         sleep()
         t+=1
-        if t==6:
+        if t>=6 and already_time>360:
             break
 
 
 
 def close_vedio(web,wait_time):
     web.switch_to.window(web.window_handles[1])
+    sleep()
+    title=web.find_element_by_xpath('//*[@id="root"]/div/section/div/div/div/div/div[2]/section/div/div/div/div/div/div/div/div[2]/div[1]')
+    web.execute_script("arguments[0].scrollIntoView();", title)  # 拖动到可见的元素去
     time.sleep(wait_time+random.randrange(1,3))
     web.close()
     web.switch_to.window(web.window_handles[0])
 
 
 def enter_bialing(web):
-    #jsCode = "var q=document.documentElement.scrollTop=100000"
-    #web.execute_script(jsCode)
     sleep()
     target = web.find_element_by_id("JEDXfdDkvQ")
     web.execute_script("arguments[0].scrollIntoView();", target)  # 拖动到可见的元素去
@@ -515,17 +507,28 @@ def obtian_another_point(web):
     unfin_but = get_all_jifeng_but(web)
     if unfin_but[3][2]=='去看看':
         unfin_but[1][2].click()
-        web.close()
+
+        sleep()
+
+        sleep()
         web.switch_to.window(web.window_handles[0])
+
         sleep()
         enter_bialing(web)
         sleep()
         back_my_point(web)
-
+    unfin_but = get_all_jifeng_but(web)
     if unfin_but[3][1]=='去看看':
         unfin_but[1][1].click()
-        web.close()
+
         web.switch_to.window(web.window_handles[0])
+        sleep()
+
+        sleep()
+
+
+        sleep()
+
         get_article_point(web)
 
 
@@ -542,6 +545,20 @@ def main():
     web.get('https://pc.xuexi.cn/points/my-points.html')
     time.sleep(10)  # 请务必在10秒内进行扫码登录，否则程序将报错
     answer(web)
+    sleep()
+    changeBackMyPoint(web)
+    sleep()
+    #back_my_point(web)
+    # web.find_element_by_xpath('//*[@id="app"]/div[5]/div[1]/div[1]/div/div[1]/img').click()
+    # sleep()
+    # web.close()
+    # web.switch_to.window(web.window_handles[0])
+    # sleep()
+    # web.find_element_by_xpath('//*[@id="root"]/div/div/section/div/div/div/div/div[4]/section/div[4]').click()
+    # sleep()
+    # web.close()
+    # web.switch_to.window(web.window_handles[0])
+    # sleep()
     obtian_another_point(web)
 
 
@@ -642,8 +659,7 @@ def text_backMyPoint():
 
 
 if __name__ == '__main__':
-
-    main()
-
-
-
+    try:
+        main()
+    except:
+        main()
