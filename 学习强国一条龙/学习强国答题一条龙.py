@@ -6,10 +6,19 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 import random
 import math
+import threading
 
+
+import tkinter
+from tkinter import Label
+from PIL import Image, ImageTk
+import time
+
+
+flag_weeeky_special={'每周答题':0,'专项答题':0}
 
 def sleep():
-    time.sleep(random.randrange(2, 5))
+    time.sleep(random.randrange(2,3))
 
 
 def get_tip(web):
@@ -88,7 +97,8 @@ def solve_vedio(web):
     for i in emps:
         i.send_keys('123')
         t += 1
-    web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button').click()
+    tmp=web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[2]/button')
+    web.execute_script("arguments[0].click();", tmp)
     time.sleep(random.randrange(1, 4))
     try:
         web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[4]/div[3]/div/div[1]')
@@ -138,7 +148,14 @@ def get_all_jifeng_but(web):
         useful_but[0].append(tmp_name)
         useful_but[1].append(tmp)
         useful_but[2].append(tmp_s)#积分情况
-        useful_but[3].append(tmp.text)
+        if tmp_name in flag_weeeky_special:
+            if flag_weeeky_special[tmp_name]==1:
+                useful_but[3].append('已完成')
+            else:
+                useful_but[3].append(tmp.text)
+        else:
+            useful_but[3].append(tmp.text)
+
         Save_point(useful_but)
     return useful_but
 
@@ -164,17 +181,30 @@ def solve_anyone(web):
 
 
 def enter_weekly(web):
-    l = len(get_all_issue_name(web)[0])
-
-    for j in range(l):
-        entrance = get_all_issue_name(web)
-        if '重新答题' in entrance[0][j]:
-            continue
-
-        entrance[1][j].click()
+    #l = len(get_all_issue_name(web)[0])
+    t=0
+    f=0
+    while t<1:
         sleep()
-        solve_anyone(web)
-        break
+        l = len(get_all_issue_name(web)[0])
+        for j in range(l):
+            entrance = get_all_issue_name(web)
+            if '重新答题' in entrance[0][j]:
+                continue
+
+            entrance[1][j].click()
+            sleep()
+            solve_anyone(web)
+            t+=1
+            break
+        sleep()
+        if f==2:
+            flag_weeeky_special['每周答题']=1
+
+            break
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[5]/ul/li[5]/a').click()
+        f+=1
+
     sleep()
     web.back()
 
@@ -185,24 +215,38 @@ def get_special_item(web):
 
 #专项答题的xpath比较特色，所用到的函数都需要特色处理
 def enter_special(web):
-    sleep()
-    items = get_special_item(web)
-    for i in items:
-        left = i.find_element_by_xpath('./div[1]').text
-        right = i.find_element_by_xpath('./div[@class="right"]/button')
+    t=0
+    f=0
+    while t<1 :
+        sleep()
+        items = get_special_item(web)
+        for i in items:
+            left = i.find_element_by_xpath('./div[1]').text
+            right = i.find_element_by_xpath('./div[@class="right"]/button')
 
-        if (right.text == "开始答题") or (right.text =='继续答题'):
-            right.click()
-            sleep()
-            special_solve_anyone(web)
-            sleep()
-            web.back()
-            print("专项答题——", left, "完成了")
+            if (right.text == "开始答题") :#or (right.text =='继续答题'):
+                right.click()
+                sleep()
+                special_solve_anyone(web)
+                sleep()
+                web.back()
+                print("专项答题——", left, "完成了")
+                t+=1
+                break
+        if f==6 or t==1:
+            flag_weeeky_special['专项答题']=1
             break
+        ul=web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[5]/ul/li[9]/a/i/svg')
+        web.execute_script("arguments[0].scrollIntoView();", ul)
+
+        web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[5]/ul/li[9]/a').click()
+        f+=1
+
 
 
 def special_solve_anyone(web):
     time.sleep(random.randrange(2, 5))
+    try_to_flush(web)
     while special_question_num(web):
         special_solve(web)
         time.sleep(random.randrange(2, 5))
@@ -239,14 +283,18 @@ def special_solve(web):
 
 
 def special_get_tip(web):
+    try_to_flush(web)
     time.sleep(random.randrange(1, 3))
     web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[6]/div[1]/div[3]/span').click()
     time.sleep(random.randrange(1, 3))
+    try_to_flush(web)
     try:
         tips = web.find_elements_by_xpath('//*[@id="body-body"]/div[4]/div/div/div/div[2]/div/div/div/font')
     except:
         return []
-    web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[6]/div[1]/div[3]/span').click()
+    try_to_flush(web)
+    tmp=web.find_element_by_xpath('//*[@id="app"]/div/div[2]/div/div[6]/div[1]/div[3]/span')
+    web.execute_script("arguments[0].click();", tmp)
     tip = []
     for i in tips:
         tip.append(i.text)
@@ -333,6 +381,7 @@ def changeBackMyPoint(web):
     changeTheHandles(web,my_learning_xpth)
     my_point_xpth='//*[@id="app"]/div/div[2]/div/div/div[1]/div/a[3]/div/div[1]/div'
     changeTheHandles(web,my_point_xpth)
+    try_to_flush(web)
 
 
 def answer(web):
@@ -370,14 +419,19 @@ def answer(web):
 
 
 def get_article_point(web):
-    web.find_element_by_xpath('//*[@id="25fa"]/div/div/div/div/div/div/div[1]').click()
+    tmp=web.find_element_by_xpath('//*[@id="25fa"]/div/div/div/div/div/div/div[1]')
+    web.execute_script("arguments[0].click();", tmp)
     sleep()
     web.switch_to.window(web.window_handles[1])
     sleep()
     get_all_article_title(web)
 
 def get_all_article_title(web):
-    with open('已经听过的音频.txt',mode='r+') as f:
+    with open('用户信息.txt', mode='r+') as r:
+        a = r.readline().strip()
+
+
+    with open(a+'已经听过的音频.txt',mode='r+') as f:
         already=f.read()
     print(already)
     #already=[]
@@ -507,12 +561,14 @@ def back_my_point(web):
     web.close()
     web.switch_to.window(web.window_handles[0])
     sleep()
+    try_to_flush(web)
 
 
 
 def obtian_another_point(web):
     unfin_but = get_all_jifeng_but(web)
     if unfin_but[3][2]=='去看看':
+        try_to_flush(web)
         unfin_but[1][2].click()
 
         sleep()
@@ -526,6 +582,7 @@ def obtian_another_point(web):
         back_my_point(web)
     unfin_but = get_all_jifeng_but(web)
     if unfin_but[3][1]=='去看看':
+        try_to_flush(web)
         unfin_but[1][1].click()
 
         web.switch_to.window(web.window_handles[0])
@@ -576,6 +633,22 @@ def get_users(web):
         f.write(us_name+'\n')
         f.write(us_information)
     changeBackMyPoint(web)
+    try:
+        w=open(us_name+'已经听过的音频.txt',mode='r+')
+        w.close()
+    except:
+        w=open(us_name+'已经听过的音频.txt',mode='w+')
+        w.close()
+
+
+
+def try_to_flush(web):
+    try:
+        web.find_element_by_xpath('//*[@id="body-body"]/div[4]/div/div[2]/div/div[2]/div/div/div[2]/button[2]').click()
+        sleep()
+        print('flush succeed')
+    except:
+        pass
 
 
 def main():
@@ -583,26 +656,40 @@ def main():
     option.add_argument('--disable-blink-features=AutomationControlled')
     option.add_experimental_option('excludeSwitches', ['enable-automation'])
     option.add_experimental_option("detach", True)
+    option.add_argument("--headless")
+    option.add_argument("--disable-gpu")
+    option.add_argument("--mute-audio")  # 静音
 
     web = Chrome(options=option)
     web.maximize_window()
 
     web.get('https://pc.xuexi.cn/points/my-points.html')
+    sleep()
 
     with open('二维码.png',mode='wb+') as p:
         img=get_QRcode(web)
         p.write(img)
 
+    qr_code().scan_qr_code()
+
     time.sleep(10)  # 请务必在10秒内进行扫码登录，否则程序将报错
+    try_to_flush(web)
+    print(1)
     get_users(web)
     sleep()
-
+    print(2)
+    try_to_flush(web)
     answer(web)
+    print(3)
     sleep()
+    try_to_flush(web)
     changeBackMyPoint(web)
     sleep()
+    print(4)
 
     obtian_another_point(web)
+    print(5)
+    web.quit()
 
 
 def text_daily():
@@ -701,5 +788,46 @@ def text_backMyPoint():
     back_my_point(web)
 
 
-if __name__ == '__main__':
+class qr_code():
+
+    root = tkinter.Tk()
+
+    def scan_qr_code(self):
+        # 无法调整尺寸
+        self.root.resizable(False, False)
+        self.root.title("请扫描学习强国二维码")
+
+        """屏幕的尺寸和大小"""
+        window_width = 400
+        window_height = 480
+
+        # 屏幕的高度和宽度
+        screen_size_height = self.root.winfo_screenheight()
+        screen_size_width = self.root.winfo_screenheight()
+
+        pos_x = (screen_size_height - window_height) / 2
+        pos_y = (screen_size_width - window_width) / 2
+
+        self.root.geometry('%dx%d+%d+%d' % (window_height, window_width, pos_x, pos_y))
+
+        """抓取二维码图片"""
+        QR_image = Image.open('二维码.png')
+        QR_png = ImageTk.PhotoImage(QR_image)
+        image_label = Label(self.root, image=QR_png)
+        image_label.pack()
+
+        t = threading.Thread(target=self.close_window)
+        t.start()
+
+        self.root.mainloop()
+
+    def close_window(self):
+        time.sleep(10)
+        self.root.destroy()
+        self.root.quit()
+
+
+if __name__ == "__main__":
+
     main()
+
