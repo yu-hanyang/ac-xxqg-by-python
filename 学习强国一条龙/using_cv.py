@@ -446,8 +446,9 @@ def get_all_article_title(web):
                 '//*[@id="root"]/div/div/section/div/div/div/div/div/section/div/div/div/div/div/section/div/div/div/div/div/section/div/div/div/div/div[3]/section/div/div/div/div/div/section/div/div/div[2]/div/div[5]').click()
             f += 1
         else:
-            web.find_element_by_xpath(
-                '//*[@id="root"]/div/div/section/div/div/div/div/div/section/div/div/div/div/div/section/div/div/div/div/div/section/div/div/div/div/div[3]/section/div/div/div/div/div/section/div/div/div[2]/div/div[7]').click()
+            BOT=web.find_element_by_xpath(
+                '//*[@id="root"]/div/div/section/div/div/div/div/div/section/div/div/div/div/div/section/div/div/div/div/div/section/div/div/div/div/div[3]/section/div/div/div/div/div/section/div/div/div[2]/div/div[7]')
+            web.execute_script("arguments[0].click();", BOT)
 
 
 def enter_each_article(web, already, t):
@@ -462,7 +463,7 @@ def enter_each_article(web, already, t):
     for i in items:
         if i.text in already:
             continue
-        f.write(i.text)
+        f.write(i.text.strip())
         i.click()
         switch_to_play_and_switch_back(web)
         t += 1
@@ -502,6 +503,8 @@ def play_audio(web):
     page = web.find_elements_by_xpath(
         '//*[@id="root"]/div/section/div/div/div/div/div[2]/section/div/div/div/div/div/div/div[3]/div[1]/p')
     l = len(page)
+    if l==0:
+        l+=1
     waittime = math.ceil(60 / l)
     for i in page:
         web.execute_script("arguments[0].scrollIntoView();", i)  # 拖动到可见的元素去
@@ -543,6 +546,8 @@ def enter_bialing(web):
     sleep()
     target = web.find_element_by_id("JEDXfdDkvQ")
     web.execute_script("arguments[0].scrollIntoView();", target)  # 拖动到可见的元素去
+    sleep()
+    sleep()
     sleep()
     web.find_element_by_xpath('//*[@id="JEDXfdDkvQ"]/div/div/div/div/div/div/span/img').click()
 
@@ -672,9 +677,10 @@ def main():
     option.add_argument('--disable-blink-features=AutomationControlled')
     option.add_experimental_option('excludeSwitches', ['enable-automation'])
     option.add_experimental_option("detach", True)
-    # option.add_argument("--headless")
-    # option.add_argument("--disable-gpu")
-    # option.add_argument("--mute-audio")  # 静音
+
+    option.add_argument("--headless")
+    option.add_argument("--disable-gpu")
+    option.add_argument("--mute-audio")  # 静音
 
     web = Chrome(options=option)
     web.maximize_window()
@@ -762,7 +768,7 @@ def text_weeklyToMypoint():
     option = Options()
     option.add_argument('--disable-blink-features=AutomationControlled')
     option.add_experimental_option('excludeSwitches', ['enable-automation'])
-    option.add_experimental_option("detach", True)
+    option.add_experimental_option("detach", True) 
 
     web = Chrome(options=option)
     web.get('https://pc.xuexi.cn/points/exam-weekly-list.html')
